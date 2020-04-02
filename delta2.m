@@ -1,11 +1,11 @@
-function CarVSAirplane()
+function delta2()
 trainTestRatio = 0.5;
 lr = 0.0005;
 f = @logsig;
 gradf = @(x) f(x).*(1 - f(x));
 
 [xTrain, dTrain, xTest, dTest, imgTest] = Load('cars', 'airplanes', trainTestRatio);
-[w, e] = OfflineLearning(xTrain, dTrain, f, gradf, lr, @Stop);
+[w, E] = OfflineLearning(xTrain, dTrain, f, gradf, lr, @Stop);
 
 y = Predict(xTest, f, w);
 y = OutputToClass(y, nax(dTest(:)));
@@ -56,7 +56,7 @@ imgTest = img(p(n+1:end), :);
 end
 
 function [img, N] = LoadFolder(folder)
-files = dir([folder '/*.jpg']);
+files = dir([folder '\*.jpg']);
 N = length(files);
 img = [];
 
@@ -93,6 +93,24 @@ for i = i:size(x, 1)
     y(i, :) = f((x(i, :)*w)); %*w nem biztos
 end
 
+end
+
+function w = OfflineLearning(x, d, f, gradf, stop)
+    [~, n] = size(x);
+    w = randn(n,size(d,2));
+    epoch = 0;
+    lr = 0.01;
+
+    while true
+         v = x * w;
+         y = f(v);
+         e = y - d;
+         g = x' * (e .* gradf(v)); %
+         w = w - lr * g;
+         E = sum(e(:).^2);
+         if stop(E, epoch), break; end
+         epoch = epoch + 1;
+    end
 end
 
 
