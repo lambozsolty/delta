@@ -15,12 +15,12 @@ end
 function Draw(predicted, actual, X)
 c = ["car", "airplane"];
 close all;
-nrows = 3;
-ncols = 6;
+nrows = 5;
+ncols = 5;
 predicted = predicted + 1;
 actual = actual + 1;
-for i = 1:nrows -1
-    for j = 1:ncols -1
+for i = 1:nrows
+    for j = 1:ncols
         k = (i - 1) * ncols + j;
         subplot(nrows, ncols, k);
         k
