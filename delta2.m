@@ -1,14 +1,14 @@
 function delta2()
+clc;
 trainTestRatio = 0.5;
-lr = 0.0005;
 f = @logsig;
 gradf = @(x) f(x).*(1 - f(x));
 
 [xTrain, dTrain, xTest, dTest, imgTest] = Load('cars', 'airplanes', trainTestRatio);
-[w, E] = OfflineLearning(xTrain, dTrain, f, gradf, lr, @Stop);
+[w, E] = OfflineLearning(xTrain, dTrain, f, gradf, @Stop);
 
 y = Predict(xTest, f, w);
-y = OutputToClass(y, nax(dTest(:)));
+y = OutputToClass(y, max(dTest(:)));
 Draw(y, dTest, imgTest);
 end
 
@@ -20,8 +20,8 @@ ncols = 6;
 predicted = predicted + 1;
 actual = actual + 1;
 
-for i = 1:nrows
-    for j = 1:ncols
+for i = 1:nrows -1
+    for j = 1:ncols -1
         k = (i - 1) * ncols + j;
         subplot(nrows, ncols, k);
         img = uint8(reshape (X(k, :), 64, 64));
@@ -36,6 +36,11 @@ figure
 confusionchart(c(actual), c(predicted));
 set(gcf, 'Position', [50, 0, 560, 136]);
 MinGui()
+end
+
+
+function outp = OutputToClass(y,number)
+outp = y>number/2;
 end
 
 function [xTrain, dTrain, xTest, dTest, imgTest] = Load(folder1, folder2, trainTestRatio)
@@ -56,7 +61,7 @@ imgTest = img(p(n+1:end), :);
 end
 
 function [img, N] = LoadFolder(folder)
-files = dir([folder '\*.jpg']);
+files = dir([folder '/*.jpg']);
 N = length(files);
 img = [];
 
@@ -65,8 +70,8 @@ for i = 1:N
     img_i = imread([folder '/' files(i).name]);
     img_i = imresize(img_i, [64, 64]);
     
-    if size(img_1, 3) == 3
-        img_1 = rgb2gray(img_1);
+    if size(img_i, 3) == 3
+        img_i = rgb2gray(img_i);
     end
     
     img(i, :) = double(img_i(:))';
@@ -89,17 +94,17 @@ end
 function y = Predict(x, f, w)
 y = zeros(size(x, 1), size(w, 2));
 
-for i = i:size(x, 1)
+for i = 1:size(x, 1)
     y(i, :) = f((x(i, :)*w)); %*w nem biztos
 end
 
 end
 
-function w = OfflineLearning(x, d, f, gradf, stop)
+function [w,E] = OfflineLearning(x, d, f, gradf, stop)
     [~, n] = size(x);
     w = randn(n,size(d,2));
     epoch = 0;
-    lr = 0.01;
+    lr = 0.0005;
 
     while true
          v = x * w;
@@ -112,6 +117,5 @@ function w = OfflineLearning(x, d, f, gradf, stop)
          epoch = epoch + 1;
     end
 end
-
 
 
