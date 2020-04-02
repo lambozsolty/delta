@@ -1,6 +1,6 @@
 function delta2()
 clc;
-trainTestRatio = 0.5;
+trainTestRatio = 0.7;
 f = @logsig;
 gradf = @(x) f(x).*(1 - f(x));
 
@@ -15,27 +15,27 @@ end
 function Draw(predicted, actual, X)
 c = ["car", "airplane"];
 close all;
-nrows = 6;
+nrows = 3;
 ncols = 6;
 predicted = predicted + 1;
 actual = actual + 1;
-
 for i = 1:nrows -1
     for j = 1:ncols -1
         k = (i - 1) * ncols + j;
         subplot(nrows, ncols, k);
-        img = uint8(reshape (X(k, :), 64, 64));
+        k
+        img = uint8(reshape (X(k,:),64,64));
         imshow(img);
         xlabel(c(predicted(k)));
     end
 end
 set(gcf, 'Position', [50, 211, 560, 690]);
-MinGui()
+%MinGui()
 
 figure
 confusionchart(c(actual), c(predicted));
 set(gcf, 'Position', [50, 0, 560, 136]);
-MinGui()
+%MinGui()
 end
 
 
@@ -52,7 +52,7 @@ N = N0 + N1;
 p = randperm(N);
 d = d(p);
 X = zscore(img(p, :));
-n = round(N - trainTestRatio);
+n = round(N * trainTestRatio);
 xTrain = X(1:n, :);
 xTest = X(n+1:end, :);
 dTrain = d(1:n);
@@ -105,7 +105,6 @@ function [w,E] = OfflineLearning(x, d, f, gradf, stop)
     w = randn(n,size(d,2));
     epoch = 0;
     lr = 0.0005;
-
     while true
          v = x * w;
          y = f(v);
